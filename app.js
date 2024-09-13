@@ -16,5 +16,6 @@ app.use(cors());
 app.use('/admin', adminroute);
 
 sequelise.sync()
+//sequelise.sync({force : true})
 .then(() => {app.listen(3000, ()=> console.log('sserver is ready at 3000'))}
 ).catch(err => console.log(err))
