@@ -7,5 +7,10 @@ exports.addUser= (req,res,next) => {
         console.log('succesfull in adding a new user');
         res.redirect('/form1.html')
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+        if(err.name ==='SequelizeUniqueConstraintError')
+            {
+            res.json({message: "this email already exists"})
+        }
+})
 }
