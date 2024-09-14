@@ -42,7 +42,7 @@ exports.userlogin = async (req,res,next) => {
             <body>
                 <script>
                 alert('User logged in successfully');
-                window.location.href = '/form2.html'; // Redirect after the alert
+                window.location.href = '/expense.html'; // Redirect after the alert
                 </script>
             </body>
         </html>`

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<body>
+    <form name="form" id="form">
+        <label for="expense"> expense</label>
+        <input type="number" name="expense" id="expense">
+        <label for="catogory"> catogory</label>
+        <select id="catogory" name="catogory">
+            <option value="food">food </option>
+            <option value="fuel">fuel </option>
+            <option value="tour">tour </option>
+            <option value="sports">sports </option>
+            <option value="party">party</option>
+          </select>
+        <label for="description"> description</label>
+        <input type="text" name="description" id="description">
+        <button type="submit">submit</button>
+    </form>   
+    <div id = "div"></div>
+</body>
+<script>
+    const form = document.getElementById('form');
+    const div = document.getElementById('div');
+    document.addEventListener('DOMContentLoaded', ()=>{
+        axios.get("http://localhost:3000/user/get_expense")
+        .then(response => {
+            response.data.forEach(element => {
+                const li = document.createElement('li');
+                const dlt_btn = document.createElement('button');
+
+                li.textContent = `${element.expense}  ${element.catogory}  ${element.description}`
+                dlt_btn.textContent= "delete";
+
+                li.appendChild(dlt_btn);
+                div.appendChild(li);
+            });
+        })
+        .catch(err => consol.log(err))
+    })  
+
+
+    form.addEventListener('submit', handlesubmit);
+    function handlesubmit(event){
+        event.preventDefault();
+        const expense = event.target.expense.value;
+        const description = event.target.description.value;
+        const catogory = event.target.catogory.value;
+        const data = {
+            expense : expense,
+            catogory : catogory,
+            description : description
+        }
+        axios.post("http://localhost:3000/user/add_expense", data)
+        .then((response)=> {
+            console.log(response.data.data)
+        })
+        .catch(err => console.log(err))
+    }
+</script>
+</html>
