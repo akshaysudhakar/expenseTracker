@@ -7,7 +7,7 @@
 </head>
 <script src = "https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
 <body>
-    <form action="/admin/login" method = 'POST'>
+    <form id="form">
         <label for="email">Enter e-mail</label>
         <input type="text" name="email" id="wmail" required>
         <label for="password">Enter password</label>
@@ -16,4 +16,31 @@
     </form>   
     <a href="form1.html">new user?</a>
 </body>
+<script>
+    const form = document.getElementById('form')
+    form.addEventListener("submit" , handlesubmit);
+    function handlesubmit(event){
+        event.preventDefault();
+        const email = event.target.email.value;
+        const password = event.target.password.value;
+        const details = {
+            email : email,
+            password:password
+        }
+        axios.post("http://localhost:3000/user/login", details)
+        .then(response => {
+            const token = response.data.token
+            localStorage.setItem("token" ,token)
+            console.log(token)
+            if(token){
+                window.location.href = "/expense.html"
+            } 
+            else{
+                alert('login not success')
+                window.location.href = "/form2.html"
+            }
+        })
+        .catch(err => console.log(err))
+    }
+</script>
 </html>

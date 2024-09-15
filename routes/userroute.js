@@ -8,5 +8,9 @@ route.post('/add_expense', usercantrole.add_expense);
 
 route.get('/get_expense', usercantrole.get_expense);
 
+route.post('/login', usercantrole.userlogin );
+
+route.post('/delete_expense', usercantrole.deleteUser)
+
 
 module.exports = route;

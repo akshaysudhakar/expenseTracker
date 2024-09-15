@@ -18,6 +18,9 @@ app.use(cors());
 app.use('/admin', adminroute);
 app.use('/user', userroute)
 
+expense.belongsTo(user);
+user.hasMany(expense);
+
 sequelise.sync()
 //sequelise.sync({force : true})
 .then(() => {app.listen(3000, ()=> console.log('sserver is ready at 3000'))}

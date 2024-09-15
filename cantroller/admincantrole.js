@@ -25,35 +25,3 @@ exports.addUser = async (req, res, next) => {
     }
 };
 
-exports.userlogin = async (req,res,next) => {
-    const email = req.body.email;
-    const password = req.body.password;
-    try {
-        const user = await usermodel.findOne({where : {email : email}}) 
-        if(!user){
-            return res.json({message : 'user not found'})
-        }
-
-        const ismatch = await bcrypt.compare(password, user.password);
-        console.log(ismatch)
-        if(ismatch){
-            res.send(
-            `<html>
-            <body>
-                <script>
-                alert('User logged in successfully');
-                window.location.href = '/expense.html'; // Redirect after the alert
-                </script>
-            </body>
-        </html>`
-            )
-        }
-        else {
-            return res.json({message: 'password mismatch'})
-        }
-    }
-    catch(err) {
-        res.json({message : 'some error occured at backend'})
-        console.log(err)
-    }
-}
