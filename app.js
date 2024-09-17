@@ -1,14 +1,22 @@
 const express = require('express');
 const path = require('path')
+
+
+
 const cors = require('cors')
-const sequelise = require('./util/database')
-const app = express();
 
 const user = require('./models/user')
 const expense = require('./models/expense')
+const orders = require('./models/order')
+const sequelise = require('./util/database')
 
 const adminroute = require('./routes/admin');
 const userroute = require('./routes/userroute')
+
+
+const app = express();
+
+
 
 app.use(express.static(path.join(__dirname,'public')))
 app.use(express.urlencoded({ extended: true }))
@@ -20,6 +28,8 @@ app.use('/user', userroute)
 
 expense.belongsTo(user);
 user.hasMany(expense);
+orders.belongsTo(user);
+user.hasMany(orders)
 
 sequelise.sync()
 //sequelise.sync({force : true})
