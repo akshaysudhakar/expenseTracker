@@ -82,7 +82,6 @@ exports.get_expense =  async (req,res,next) => {
         expenses.forEach((element,index) => {
             expenses[index].dataValues.id = "confidential" ;
             expenses[index].dataValues.userId = "confidential"
-            console.log(expenses[index].dataValues.id)
         });
 
         res.json(expenses)
