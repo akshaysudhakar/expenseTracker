@@ -5,8 +5,27 @@
         const token = localStorage.getItem('token')
         axios.get("http://localhost:3000/user/get_expense", {headers : {'authorisation' : token}})
         .then(response => {
+            if(response.data.premium){
+                const premium_devision = document.getElementById('premiumUser');
+                const p = document.createElement('p');
+                const leaderboard = document.createElement('button');
+                p.textContent = "You are a premium User";
+                leaderboard.textContent = "Show Leaderboard";
+                leaderboard.addEventListener('click' , handleLeaderBoard)
+                premium_devision.appendChild(p);
+                premium_devision.appendChild(leaderboard)
+            }
+            else {
+                const premium_devision = document.getElementById('premiumUser');
+                const premiumBuy = document.createElement('button');
+                premiumBuy.textContent = "Buy Premium";
+                premiumBuy.addEventListener('click', function(){
+                    window.location.href = "/premium.html"
+                })
+                premium_devision.appendChild(premiumBuy)
+            }
             console.log(response.data)
-            response.data.forEach(element => {
+            response.data.expenses.forEach(element => {
                 const li = document.createElement('li');
                 const dlt_btn = document.createElement('button');
 
@@ -53,7 +72,15 @@
         .catch(err => console.log(err))
     }
 
-    const premium = document.getElementById('payment');
-    premium.addEventListener('click', function(){
-        window.location.href = "/premium.html"
-    })
+    function handleLeaderBoard(){
+        axios.get("http://localhost:3000/premium/leaderboard")
+        .then(response => {
+            const div = document.getElementById('premiumUser');
+            response.data.forEach(element=> {
+                const li = document.createElement('li');
+                li.textContent = `${Object.keys(element)} : ${Object.values(element)}`
+                div.appendChild(li)
+            })
+        })
+    }
+    

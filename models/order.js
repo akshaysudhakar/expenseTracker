@@ -15,7 +15,6 @@ const order_model = sequelize.define('orders', {
     status :{
         type : Sequelize.STRING,
         allowNull : false,
-        unique: true
     }
 })
 

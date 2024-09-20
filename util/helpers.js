@@ -19,10 +19,11 @@ exports.verifyToken = (token)=> {
 }
 
 
-exports.generateToken =(id,email)=>{
+exports.generateToken =(id,email,premium)=>{
     const payload = {
         id : id ,
-        email : email
+        email : email,
+        premium : premium
     }
     const secret = "oisjcfnjdhr7238q9ufh"
     return jwt.sign(payload,secret)

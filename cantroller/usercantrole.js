@@ -31,7 +31,7 @@ exports.userlogin = async (req,res,next) => {
         const ismatch = await bcrypt.compare(password, requested_user.password);
         console.log(ismatch)
         if(ismatch){
-            const usertoken = tokenVerify.generateToken(requested_user.id,requested_user.email); // here
+            const usertoken = tokenVerify.generateToken(requested_user.id,requested_user.email,requested_user.premium); 
             res.json({message : 'login successful', token : usertoken})
         }
         else {
@@ -64,14 +64,14 @@ exports.add_expense = async (req,res,next) => {
     catch(err){
         console.log(err);
         res.status(500).json({message : 'error in creating a new expense',err})
-        }
-    } 
+        }    } 
 
 exports.get_expense =  async (req,res,next) => {
     const token = req.headers.authorisation;
 
     try{
         const decoded = await tokenVerify.verifyToken(token)
+        console.log(decoded)
 
         const userId = decoded.id;  
 
@@ -84,7 +84,7 @@ exports.get_expense =  async (req,res,next) => {
             expenses[index].dataValues.userId = "confidential"
         });
 
-        res.json(expenses)
+        res.json({expenses,premium: decoded.premium})
 
     }
     catch(err){

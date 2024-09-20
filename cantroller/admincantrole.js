@@ -57,6 +57,12 @@ exports.premium_handler =  async (req,res,next)=>{
         };
         await order.create(data)
 
+        const User = await user.findByPk(userId.id);
+
+        User.premium = true;
+        
+        await User.save();
+
         res.status(200).send({
             clientSecret : payment_intent.client_secret
         })
