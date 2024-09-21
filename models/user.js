@@ -20,6 +20,11 @@ const user_model = sequelize.define('users', {
         type : Sequelize.STRING,
         allowNull : false,
     },
+    totalExpense : {
+        type : Sequelize.FLOAT,
+        allowNull : false,
+        defaultValue : 0
+    },
     premium : {
         type : Sequelize.BOOLEAN,
         defaultValue : false,

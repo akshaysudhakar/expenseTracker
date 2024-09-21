@@ -1,36 +1,33 @@
+const { Sequelize } = require('sequelize');
 const expense = require('./../models/expense');
 const user = require('./../models/user');
 
-exports.leaderBoard = async (req,res,next) =>{
-    try{
-        const users = await user.findAll()
+exports.leaderBoard = async (req, res, next) => {
+    try {
+        const userExpenses = await user.findAll({
+            include: [
+                {
+                    model: expense,
+                    attributes: [] // No need to select any columns from expense table
+                }
+            ],
+            attributes: [
+                'name', 
+                [Sequelize.fn('SUM', Sequelize.col('expenses.expense')), 'totalExpense']
+            ],
+            group: ['users.id'], // Group by user ID
+            order: [[Sequelize.literal('totalExpense'), 'DESC']] // Sort by totalExpense
+        });
 
-        const userExpenses = await Promise.all(users.map(async (element) => {
-            try{
-                userId = element.dataValues.id;
-                const User = await user.findByPk(userId)    
-                const expenses = await User.getExpenses();
-                let Expense  = 0
-                expenses.forEach(element=> {
-                    Expense+=element.dataValues.expense
-                })
-                return {[User.name] : Expense}
-            }
-            catch(err){
-                console.log("error inside forloop", err);
-            }
-        })) 
+        // Map the result to include only name and total expense
+        const result = userExpenses.map(u => ({
+            name: u.name,
+            totalExpense: u.dataValues.totalExpense
+        }));
 
-
-        const sortedUserExpenses = userExpenses.sort((a, b) => {
-            const valueA = Object.values(a)[0];
-            const valueB = Object.values(b)[0];
-            return valueA - valueB;
-          });
-
-        res.json(sortedUserExpenses)
+        res.json(result);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'An error occurred' });
     }
-    catch(err){
-        console.log(err)
-    }
-}
+};

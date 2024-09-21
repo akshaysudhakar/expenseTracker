@@ -54,10 +54,17 @@ exports.add_expense = async (req,res,next) => {
 
         data.userId = userId;
 
-        console.log(data)
+        await expense.create(data);
 
-        const new_expense = await expense.create(data);
-        console.log(new_expense)
+        const userToAdd = await user.findByPk(userId);
+        
+        
+        const newTotalExpense  = userToAdd.totalExpense + parseFloat(data.expense);
+
+        userToAdd.totalExpense = newTotalExpense;
+
+        await userToAdd.save();
+
         res.status(200).json({message : "data added successfully"})
         
     }

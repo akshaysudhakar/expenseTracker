@@ -60,16 +60,20 @@ exports.premium_handler =  async (req,res,next)=>{
         const User = await user.findByPk(userId.id);
 
         User.premium = true;
-        
+
         await User.save();
 
+        const usertoken = tokenVerify.generateToken(User.id,User.email,User.premium)
+        
+
         res.status(200).send({
-            clientSecret : payment_intent.client_secret
+            clientSecret : payment_intent.client_secret,
+            user_token : usertoken
         })
     }
     catch(err){
         console.error('Payment Handling Error:', err);
-        res.status(500).json({message : "an error at payment handling",errorMesg: err.message})
+        res.status(500).json({message : "an error at payment handling"})
     }
 }
 

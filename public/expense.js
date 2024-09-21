@@ -78,7 +78,7 @@
             const div = document.getElementById('premiumUser');
             response.data.forEach(element=> {
                 const li = document.createElement('li');
-                li.textContent = `${Object.keys(element)} : ${Object.values(element)}`
+                li.textContent = `${element.name} : ${element.totalExpense}`
                 div.appendChild(li)
             })
         })

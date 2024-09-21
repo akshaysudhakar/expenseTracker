@@ -28,9 +28,9 @@ async function handlePayment(event){
 
         const result = await axios.post("http://localhost:3000/admin/buy_premium",data)
 
-        console.log(result)
+        localStorage.setItem('token',result.data.user_token);
     }
     catch(err){
-        console.log(err)
+        console.log("an error occured",err.messsage)
     }
 }
