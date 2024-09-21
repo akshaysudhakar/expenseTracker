@@ -1,9 +1,9 @@
 const expense = require('./../models/expense');
 const user = require('./../models/user');
-
+const sequelise = require("./../util/database")
 const tokenVerify = require("./../util/helpers")
 
-const jwt = require('jsonwebtoken');
+//const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 
@@ -47,28 +47,35 @@ exports.userlogin = async (req,res,next) => {
 exports.add_expense = async (req,res,next) => {
     const data = req.body
     const token = req.body.userId
+    let t;
     try{
+        t = await  sequelise.transaction();
+
         const decoded = await tokenVerify.verifyToken(token)
 
         const userId = decoded.id; 
 
         data.userId = userId;
 
-        await expense.create(data);
+        await expense.create(data,{transaction : t});
 
-        const userToAdd = await user.findByPk(userId);
-        
+        const userToAdd = await user.findByPk(userId,{transaction : t});
         
         const newTotalExpense  = userToAdd.totalExpense + parseFloat(data.expense);
 
         userToAdd.totalExpense = newTotalExpense;
 
-        await userToAdd.save();
+        await userToAdd.save({transaction : t});
+
+        await t.commit()
 
         res.status(200).json({message : "data added successfully"})
         
     }
     catch(err){
+        if(t){
+            await t.rollback();
+        }
         console.log(err);
         res.status(500).json({message : 'error in creating a new expense',err})
         }    } 
@@ -87,7 +94,6 @@ exports.get_expense =  async (req,res,next) => {
         const expenses = await userToFetch.getExpenses();
 
         expenses.forEach((element,index) => {
-            expenses[index].dataValues.id = "confidential" ;
             expenses[index].dataValues.userId = "confidential"
         });
 
@@ -103,26 +109,39 @@ exports.get_expense =  async (req,res,next) => {
 exports.deleteUser = async (req,res,next)=>{
     const token = req.body.token;
     const expenseId = req.body.id;
+    console.log("expense",expenseId);
+    let t;
     try{
+        t=  await sequelise.transaction();
         const decoded = await tokenVerify.verifyToken(token)
 
         const userId = decoded.id; 
 
-        const userToFetch  = await user.findByPk(userId);
+        const userToFetch  = await user.findByPk(userId,{transaction : t});
 
         const expense = await userToFetch.getExpenses(
             {where: {
             id: expenseId  
-            }} 
+            }},
+            {transaction : t}
         );
 
-        const dlt_result = await expense[0].destroy()
+        const newTotalExpense  = parseFloat(userToFetch.totalExpense) - parseFloat(expense[0].expense);
 
-        console.log(dlt_result)
+        await expense[0].destroy({transaction : t})
+
+        userToFetch.totalExpense = parseFloat(newTotalExpense);
+
+        await userToFetch.save({transaction : t})
+
+        await t.commit()
 
         res.status(200).json({message : "deleted successfully"})
     }
     catch(err){
+        if(t){
+            await t.rollback()
+        }
         console.log(err)
         res.status(500).json({msg : 'delete op error'})
         }
