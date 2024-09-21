@@ -13,6 +13,7 @@ const sequelise = require('./util/database')
 const adminroute = require('./routes/admin');
 const userroute = require('./routes/userroute')
 const premiumroute = require('./routes/premium')
+const passwordroute = require('./routes/password')
 
 
 
@@ -28,7 +29,7 @@ app.use(cors());
 app.use('/admin', adminroute);
 app.use('/user', userroute);
 app.use('/premium',premiumroute);
-
+app.use('/password',passwordroute);
 
 expense.belongsTo(user);
 user.hasMany(expense);
