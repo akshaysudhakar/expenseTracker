@@ -64,10 +64,11 @@ exports.premium_handler =  async (req,res,next)=>{
         await User.save();
 
         const usertoken = tokenVerify.generateToken(User.id,User.email,User.premium)
-        
+        console.log("the client secret",payment_intent.client_secret, "the whole payment intent", payment_intent);
 
         res.status(200).send({
             clientSecret : payment_intent.client_secret,
+            message : "you are now a premium user",
             user_token : usertoken
         })
     }

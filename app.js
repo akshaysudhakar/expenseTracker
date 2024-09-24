@@ -5,10 +5,11 @@ const path = require('path')
 
 const cors = require('cors')
 
+const sequelise = require('./util/database')
 const user = require('./models/user')
 const expense = require('./models/expense')
 const orders = require('./models/order')
-const sequelise = require('./util/database')
+const forgotPassword = require('./models/forgotPassword')
 
 const adminroute = require('./routes/admin');
 const userroute = require('./routes/userroute')
@@ -33,8 +34,12 @@ app.use('/password',passwordroute);
 
 expense.belongsTo(user);
 user.hasMany(expense);
+
 orders.belongsTo(user);
 user.hasMany(orders)
+
+forgotPassword.belongsTo(user);
+user.hasMany(forgotPassword);
 
 sequelise.sync()
 //sequelise.sync({force : true})

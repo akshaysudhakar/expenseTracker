@@ -29,8 +29,11 @@ async function handlePayment(event){
         const result = await axios.post("http://localhost:3000/admin/buy_premium",data)
 
         localStorage.setItem('token',result.data.user_token);
+        alert(`${result.data.message}`)
+        window.location.href = "/expense.html"
     }
     catch(err){
-        console.log("an error occured",err.messsage)
+        console.log("an error occured")
+        alert(`${err.response.data.message}`)
     }
 }

@@ -8,7 +8,8 @@
     "mysql2": "^3.11.2",
     "sequelize": "^6.37.3",
     "sib-api-v3-sdk": "^8.5.0",
-    "stripe": "^16.11.0"
+    "stripe": "^16.11.0",
+    "uuid": "^10.0.0"
   },
   "name": "expensetracker",
   "version": "1.0.0",
