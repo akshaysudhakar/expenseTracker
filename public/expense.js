@@ -1,6 +1,5 @@
 
     const form = document.getElementById('form');
-    const div = document.getElementById('div');
     document.addEventListener('DOMContentLoaded', ()=>{
         const token = localStorage.getItem('token')
         axios.get("http://localhost:3000/user/get_expense", {headers : {'authorisation' : token}})
@@ -26,14 +25,17 @@
             }
             console.log(response.data)
             response.data.expenses.forEach(element => {
+                const ul = document.getElementById('listOfExpenses');
                 const li = document.createElement('li');
                 const dlt_btn = document.createElement('button');
 
-                li.textContent = `${element.expense}  ${element.catogory}  ${element.description}`
-                dlt_btn.textContent= "delete";
-                dlt_btn.onclick = () => handleDelete(token, element.id);
-                li.appendChild(dlt_btn);
-                div.appendChild(li);
+                ul.innerHTML += `
+                <li id=${element.id}>
+                    ${element.expense} - ${element.catogory} - ${element.description}
+                    <button onclick='handleDelete(event, ${token},${element.id})'>
+                        Delete Expense
+                    </button>
+                </li>`
             })
         })
         .catch(err => console.log(err))
@@ -84,3 +86,23 @@
         })
     }
     
+    function download(){
+        const token = localStorage.getItem('token')
+        axios.get('http://localhost:3000/user/download', { headers: {"Authorization" : token} })
+        .then((response) => {
+            if(response.status === 201){
+                //the bcakend is essentially sending a download link
+                //  which if we open in browser, the file would download
+                var a = document.createElement("a");
+                a.href = response.data.fileUrl;
+                a.download = 'myexpense.csv';
+                a.click();
+            } else {
+                throw new Error(response.data.message)
+            }
+    
+        })
+        .catch((err) => {
+            console.log(err)
+        });
+    }

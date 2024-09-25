@@ -12,5 +12,7 @@ route.post('/login', usercantrole.userlogin );
 
 route.post('/delete_expense', usercantrole.deleteUser)
 
+route.get('/download',usercantrole.downloadExpense)
+
 
 module.exports = route;
