@@ -109,6 +109,7 @@ exports.add_expense = async (req,res,next) => {
 exports.get_expense =  async (req,res) => {
     const token = req.headers.authorisation;
     const pageNumber = parseInt(req.headers.pagenumber,10) || 1
+    const rows = parseInt(req.headers.numofrows,10) || 5
     console.log(pageNumber)
 
     try{
@@ -123,8 +124,8 @@ exports.get_expense =  async (req,res) => {
 
         const expenses = await userToFetch.getExpenses(
             {
-                offset : (pageNumber-1)*5,
-                limit : 5,
+                offset : (pageNumber-1)*rows,
+                limit : rows,
                 attributes: { exclude: ['id', 'userId'] }
             } 
         );
@@ -132,7 +133,7 @@ exports.get_expense =  async (req,res) => {
         res.json({
             expenses,
             premium: decoded.premium,
-            hasNextPage : totalExpenses > pageNumber*5,
+            hasNextPage : totalExpenses > pageNumber*rows,
             hasPreviousPage : pageNumber >1,
             cPageNumber : pageNumber
         })

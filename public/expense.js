@@ -2,10 +2,11 @@
     const form = document.getElementById('form');
     document.addEventListener('DOMContentLoaded',loadDisplayExpense)
 
-        function loadDisplayExpense(event,pagenumber){
+        function loadDisplayExpense(event,pagenumber,numOfRows){
+            numOfRows =localStorage.getItem("rows")
             const ul = document.getElementById('listOfExpenses')
             const token = localStorage.getItem('token')
-            axios.get("http://localhost:3000/user/get_expense", {headers : {'authorisation' : token,"pagenumber":pagenumber}})
+            axios.get("http://localhost:3000/user/get_expense", {headers : {'authorisation' : token,"pagenumber":pagenumber,"numofrows" : numOfRows}})
         .then(response => {
             if(response.data.premium){
                 document.getElementById('notPremiumUser').style.display = "none" 
@@ -17,23 +18,25 @@
             response.data.expenses.forEach(element => {
                 displayExpense(element)
             })
+            if(response.data.hasPreviousPage){
+                const previousPageButton = document.createElement("button");
+                previousPageButton.textContent = "previous Page"
+                const rows =localStorage.getItem("rows")
+                previousPageButton.onclick = function (){
+                    ul.innerHTML = ''
+                    loadDisplayExpense(event,response.data.cPageNumber-1,rows)
+                }
+                ul.appendChild(previousPageButton) 
+            }
             if(response.data.hasNextPage){
                 const nextPageButton = document.createElement("button");
                 nextPageButton.textContent = "next Page"
                 nextPageButton.onclick = function (){
+                    const rows =localStorage.getItem("rows")
                     ul.innerHTML = ''
-                    loadDisplayExpense(event,response.data.cPageNumber+1)
+                    loadDisplayExpense(event,response.data.cPageNumber+1,rows)
                 } 
                 ul.appendChild(nextPageButton)
-            }
-            if(response.data.hasPreviousPage){
-                const previousPageButton = document.createElement("button");
-                previousPageButton.textContent = "previous Page"
-                previousPageButton.onclick = function (){
-                    ul.innerHTML = ''
-                    loadDisplayExpense(event,response.data.cPageNumber-1)
-                }
-                ul.appendChild(previousPageButton) 
             }
         })
         .catch(err => console.log(err))
@@ -120,4 +123,10 @@
         .catch((err) => {
             console.log(err)
         });
+    }
+
+    function setRows(event){
+        event.preventDefault()
+        const rows = event.target.rows.value;
+        localStorage.setItem("rows",rows)
     }

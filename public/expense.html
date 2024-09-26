@@ -30,7 +30,12 @@
         <p>You are not a premium User</p>
         <button onclick="buyPremium(event)">buy premium</button>
     </div>
-    <ul id = "listOfExpenses"></ul>
+    <ol id = "listOfExpenses"></ol>
+    <form id = "numberOfRows" onsubmit="setRows(event)">
+        <label for="rows">Select number of Rows</label>
+        <input type="number" id="rows" name="rows">
+        <button type="submit">select</button>
+    </form>
     <button onclick="download()" id="downloadexpense">Download File</button>
 </body>
 <script src="expense.js">   
