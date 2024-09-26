@@ -1,45 +1,55 @@
 
     const form = document.getElementById('form');
-    document.addEventListener('DOMContentLoaded', ()=>{
-        const token = localStorage.getItem('token')
-        axios.get("http://localhost:3000/user/get_expense", {headers : {'authorisation' : token}})
+    document.addEventListener('DOMContentLoaded',loadDisplayExpense)
+
+        function loadDisplayExpense(event,pagenumber){
+            const ul = document.getElementById('listOfExpenses')
+            const token = localStorage.getItem('token')
+            axios.get("http://localhost:3000/user/get_expense", {headers : {'authorisation' : token,"pagenumber":pagenumber}})
         .then(response => {
             if(response.data.premium){
-                const premium_devision = document.getElementById('premiumUser');
-                const p = document.createElement('p');
-                const leaderboard = document.createElement('button');
-                p.textContent = "You are a premium User";
-                leaderboard.textContent = "Show Leaderboard";
-                leaderboard.addEventListener('click' , handleLeaderBoard)
-                premium_devision.appendChild(p);
-                premium_devision.appendChild(leaderboard)
+                document.getElementById('notPremiumUser').style.display = "none" 
             }
             else {
-                const premium_devision = document.getElementById('premiumUser');
-                const premiumBuy = document.createElement('button');
-                premiumBuy.textContent = "Buy Premium";
-                premiumBuy.addEventListener('click', function(){
-                    window.location.href = "/premium.html"
-                })
-                premium_devision.appendChild(premiumBuy)
+                document.getElementById('PremiumUser').style.display = "none"
             }
             console.log(response.data)
             response.data.expenses.forEach(element => {
-                const ul = document.getElementById('listOfExpenses');
-                const li = document.createElement('li');
-                const dlt_btn = document.createElement('button');
-
-                ul.innerHTML += `
-                <li id=${element.id}>
-                    ${element.expense} - ${element.catogory} - ${element.description}
-                    <button onclick='handleDelete(event, ${token},${element.id})'>
-                        Delete Expense
-                    </button>
-                </li>`
+                displayExpense(element)
             })
+            if(response.data.hasNextPage){
+                const nextPageButton = document.createElement("button");
+                nextPageButton.textContent = "next Page"
+                nextPageButton.onclick = function (){
+                    ul.innerHTML = ''
+                    loadDisplayExpense(event,response.data.cPageNumber+1)
+                } 
+                ul.appendChild(nextPageButton)
+            }
+            if(response.data.hasPreviousPage){
+                const previousPageButton = document.createElement("button");
+                previousPageButton.textContent = "previous Page"
+                previousPageButton.onclick = function (){
+                    ul.innerHTML = ''
+                    loadDisplayExpense(event,response.data.cPageNumber-1)
+                }
+                ul.appendChild(previousPageButton) 
+            }
         })
         .catch(err => console.log(err))
-    })  
+    }
+
+    function displayExpense(element){
+        const token = localStorage.getItem('token')
+        const ul = document.getElementById('listOfExpenses');
+        ul.innerHTML += `
+        <li id=${element.id}>
+            ${element.expense} - ${element.catogory} - ${element.description}
+            <button onclick='handleDelete(event, ${token},${element.id})'>
+                Delete Expense
+            </button>
+        </li>`
+    }
 
 
 
@@ -72,6 +82,11 @@
             console.log(response.data)
         })
         .catch(err => console.log(err))
+    }
+
+
+    function buyPremium(){
+        window.location.href = "/premium.html"
     }
 
     function handleLeaderBoard(){

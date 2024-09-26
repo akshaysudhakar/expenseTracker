@@ -106,8 +106,10 @@ exports.add_expense = async (req,res,next) => {
         res.status(500).json({message : 'error in creating a new expense',err})
         }    } 
 
-exports.get_expense =  async (req,res,next) => {
+exports.get_expense =  async (req,res) => {
     const token = req.headers.authorisation;
+    const pageNumber = parseInt(req.headers.pagenumber,10) || 1
+    console.log(pageNumber)
 
     try{
         const decoded = await tokenVerify.verifyToken(token)
@@ -117,13 +119,23 @@ exports.get_expense =  async (req,res,next) => {
 
         const userToFetch  = await user.findByPk(userId);
 
-        const expenses = await userToFetch.getExpenses();
+        const totalExpenses = await userToFetch.countExpenses();
 
-        expenses.forEach((element,index) => {
-            expenses[index].dataValues.userId = "confidential"
-        });
+        const expenses = await userToFetch.getExpenses(
+            {
+                offset : (pageNumber-1)*5,
+                limit : 5,
+                attributes: { exclude: ['id', 'userId'] }
+            } 
+        );
 
-        res.json({expenses,premium: decoded.premium})
+        res.json({
+            expenses,
+            premium: decoded.premium,
+            hasNextPage : totalExpenses > pageNumber*5,
+            hasPreviousPage : pageNumber >1,
+            cPageNumber : pageNumber
+        })
 
     }
     catch(err){

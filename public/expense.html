@@ -22,7 +22,14 @@
         <input type="text" name="description" id="description">
         <button type="submit">submit</button>
     </form>   
-    <div id="premiumUser"></div>
+    <div id="premiumUser">
+        <p>You are a premium User</p>
+        <button onclick="handleLeaderBoard(event)">Show Leaderboard</button>
+    </div>
+    <div id="notPremiumUser">
+        <p>You are not a premium User</p>
+        <button onclick="buyPremium(event)">buy premium</button>
+    </div>
     <ul id = "listOfExpenses"></ul>
     <button onclick="download()" id="downloadexpense">Download File</button>
 </body>
