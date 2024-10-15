@@ -15,6 +15,10 @@ const order_model = sequelize.define('orders', {
     status :{
         type : Sequelize.STRING,
         allowNull : false,
+    },
+    sessionId  :{
+        type : Sequelize.STRING,
+        allowNull : false,
     }
 })
 

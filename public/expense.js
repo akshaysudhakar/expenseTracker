@@ -12,14 +12,14 @@
                 document.getElementById('notPremiumUser').style.display = "none" 
             }
             else {
-                document.getElementById('PremiumUser').style.display = "none"
+                document.getElementById('premiumUser').style.display = "none"
             }
             console.log(response.data)
             response.data.expenses.forEach(element => {
                 displayExpense(element)
             })
             if(response.data.hasPreviousPage){
-                const previousPageButton = document.createElement("button");
+                const previousPageButton = document.createElement("button")
                 previousPageButton.textContent = "previous Page"
                 const rows =localStorage.getItem("rows")
                 previousPageButton.onclick = function (){
@@ -68,7 +68,7 @@
             description : description,
             userId : token
         }
-        axios.post("http://localhost:3000/user/add_expense", data)
+        axios.post("http://localhost:3000/user/add_expense", data , {headers : {'authorisation' : token}})
         .then((response)=> {
             console.log(response.data.data)
         })
@@ -89,7 +89,7 @@
 
 
     function buyPremium(){
-        window.location.href = "/premium.html"
+        window.location.href = "/stripe.html"
     }
 
     function handleLeaderBoard(){
@@ -106,7 +106,7 @@
     
     function download(){
         const token = localStorage.getItem('token')
-        axios.get('http://localhost:3000/user/download', { headers: {"Authorization" : token} })
+        axios.get('http://localhost:3000/premium/download', { headers: {"authorisation" : token} })
         .then((response) => {
             if(response.status === 201){
                 //the bcakend is essentially sending a download link

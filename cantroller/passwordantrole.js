@@ -5,7 +5,7 @@ const sequelize = require("../util/database")
 const user = require("./../models/user")
 const forgot_password = require("./../models/forgotPassword")
 
-const tokenVerify = require("./../util/helpers")
+const tokenVerify = require("../util/helpers")
 
 
 const client = sib.ApiClient.instance
@@ -67,6 +67,7 @@ exports.forgotPassword = async (req,res,next) => {
     }
     catch(err){
         if(t) await t.rollback()
+        console.log(err)
         res.status(500).json(err)
     }   
 }
@@ -92,12 +93,11 @@ exports.resetPasswordVerify = async (req,res,next) => {
 exports.resetPasswordNew = async (req,res,next)=>{
     const newPassword = req.body.newPassword;
     const uuid = req.body.uuid;
-    const token = req.body.token;
+    const userId = req.user.id;
     let t
     try{
-        t =  await sequelize.transaction();
-        const User = await  tokenVerify.verifyToken(token); 
-        const userToFetch = await user.findByPk(User.id,{transaction : t});
+        t =  await sequelize.transaction(); 
+        const userToFetch = await user.findByPk(userId,{transaction : t});
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 

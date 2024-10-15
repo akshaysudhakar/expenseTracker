@@ -28,7 +28,8 @@
             email : email,
             password:password
         }
-        axios.post("http://localhost:3000/user/login", details)
+        console.log(details)
+        axios.post("http://localhost:3000/user/login",details)
         .then(response => {
             const token = response.data.token
             localStorage.setItem("token" ,token)
@@ -37,7 +38,7 @@
                 window.location.href = "/expense.html"
             } 
             else{
-                alert('login not success')
+                alert(`${response.data.message}`)
                 window.location.href = "/form2.html"
             }
         })

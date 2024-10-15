@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stripe Checkout Test</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<body>
+  <h1>Buy Premium Membership for $50</h1>
+  <button id="checkout-button">Checkout</button>
+
+  <script>
+    var stripe = Stripe('pk_test_51PzdsuLT6WvY2uR5fTptUSpA7hAl2oDyY7LPLLBwOOWZMazGU4g7Z4RMxrOpNGP9Ah3ZdJISNgIEGT0N3fUwsl8a005ADMPAvn'); // Replace with your Stripe Publishable Key
+
+    document.getElementById('checkout-button').addEventListener('click', function() {
+      const token = localStorage.getItem('token')
+      axios.post('http://localhost:3000/admin/buy_premium',{},{headers : {'authorisation' : token}})
+      .then(response=>{
+        const sessionId = response.data.id;
+        return stripe.redirectToCheckout({ sessionId: sessionId });
+      }).catch(err=> console.log(err.message,err.response.data.message))
+      });
+  </script>
+</body>
+</html>

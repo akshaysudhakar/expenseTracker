@@ -1,46 +1,13 @@
-const { Body } = require('sib-api-v3-sdk');
 const expense = require('./../models/expense');
 const user = require('./../models/user');
 const sequelise = require("./../util/database")
-const tokenVerify = require("./../util/helpers")
-const AWS = require('aws-sdk');
+const tokenVerify = require("../util/helpers")
 
 
-//const jwt = require('jsonwebtoken');
+
+
 const bcrypt = require('bcrypt');
 
-function uploadToS3(data,filename){
-    return new Promise((resolve,reject)=>{
-        const BUCKET_NAME = 'akshayexpensetracker'
-    const IAM_USER_KEY = process.env.AMAZON_ACCESS_KEY;
-    const IAM_USER_SECRET =process.env.AMAZON_SECRET_ACCESS_KEY
-
-    let s3Bucket = new AWS.S3({
-        accessKeyId : IAM_USER_KEY,
-        secretAccessKey : IAM_USER_SECRET
-    } )
-
-    s3Bucket.createBucket(()=>{
-        var params = {
-            Bucket : BUCKET_NAME,
-            Key : filename,
-            Body : data,
-            ACL : 'public-read'
-        }
-        s3Bucket.upload(params, (err, s3response)=>{
-            if(err){
-                console.log("not successfull",err)
-                reject(err)
-            }
-            else{
-                console.log("success",s3response)
-                resolve(s3response.Location)
-            }
-        })
-    })
-    })
-    
-}
 
 
 
@@ -72,14 +39,10 @@ exports.userlogin = async (req,res,next) => {
 
 exports.add_expense = async (req,res,next) => {
     const data = req.body
-    const token = req.body.userId
     let t;
+    const userId = req.user.id; 
     try{
         t = await  sequelise.transaction();
-
-        const decoded = await tokenVerify.verifyToken(token)
-
-        const userId = decoded.id; 
 
         data.userId = userId;
 
@@ -107,16 +70,12 @@ exports.add_expense = async (req,res,next) => {
         }    } 
 
 exports.get_expense =  async (req,res) => {
-    const token = req.headers.authorisation;
+    const userId = req.user.id; 
     const pageNumber = parseInt(req.headers.pagenumber,10) || 1
     const rows = parseInt(req.headers.numofrows,10) || 5
     console.log(pageNumber)
 
-    try{
-        const decoded = await tokenVerify.verifyToken(token)
-        console.log(decoded)
-
-        const userId = decoded.id;  
+    try{ 
 
         const userToFetch  = await user.findByPk(userId);
 
@@ -132,7 +91,7 @@ exports.get_expense =  async (req,res) => {
 
         res.json({
             expenses,
-            premium: decoded.premium,
+            premium: req.user.premium,
             hasNextPage : totalExpenses > pageNumber*rows,
             hasPreviousPage : pageNumber >1,
             cPageNumber : pageNumber
@@ -186,31 +145,6 @@ exports.deleteUser = async (req,res,next)=>{
         }
 }
 
-exports.downloadExpense = async(req,res)=>{
-    const token = req.headers.authorization;
-    try{
-        const decoded = await tokenVerify.verifyToken(token)
-        console.log(decoded)
 
-        const userId = decoded.id;  
-
-        const userToFetch  = await user.findByPk(userId);
-
-        const expenses = await userToFetch.getExpenses();
-        
-        const stringifiedExpenses = JSON.stringify(expenses);
-
-        const filename = `expense${userToFetch.id}/${new Date()}.txt`;
-
-        const fileUrl = await uploadToS3(stringifiedExpenses,filename);
-
-        res.status(201).json({fileUrl,success : true})
-
-    }
-    catch(err){
-        console.log(err)
-    }
-
-}
 
 

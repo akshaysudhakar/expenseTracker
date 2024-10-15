@@ -1,9 +1,18 @@
-const express = require('express');
+const express = require('express')
 const path = require('path')
-
+const fs = require('fs')
+const https = require('https')
 
 
 const cors = require('cors')
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan')
+
+
+
+
+
 
 const sequelise = require('./util/database')
 const user = require('./models/user')
@@ -16,21 +25,32 @@ const userroute = require('./routes/userroute')
 const premiumroute = require('./routes/premium')
 const passwordroute = require('./routes/password')
 
-
+const accessLogStream = fs.createWriteStream(path.join(__dirname,'access.log') , {flags : 'a'});
 
 const app = express();
 
 
 
+
+const privateKey = fs.readFileSync('server.key');
+const certificate = fs.readFileSync('server.cert')
+
+
 app.use(express.static(path.join(__dirname,'public')))
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json());
 app.use(cors());
+app.use(helmet());
+app.use(compression());
+app.use(morgan('combined',{stream : accessLogStream}))
+
+
+
 
 app.use('/admin', adminroute);
 app.use('/user', userroute);
 app.use('/premium',premiumroute);
 app.use('/password',passwordroute);
+
+
 
 expense.belongsTo(user);
 user.hasMany(expense);
