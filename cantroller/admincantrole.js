@@ -95,8 +95,8 @@ exports.premium_handler = async (req, res) => {
           quantity: 1,
         }],
         mode: 'payment',
-        success_url: `http://localhost:3000/success.html?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: 'http://localhost:3000/cancel.html',
+        success_url: `https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/success.html?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: 'https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/cancel.html',
       });
       const data = {
         amount : 50,
