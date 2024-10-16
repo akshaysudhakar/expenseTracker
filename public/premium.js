@@ -26,7 +26,7 @@ async function handlePayment(event){
             user_token : user_token
         }
 
-        const result = await axios.post("http://localhost:3000/admin/buy_premium",data)
+        const result = await axios.post("https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/admin/buy_premium",data)
 
         localStorage.setItem('token',result.data.user_token);
         alert(`${result.data.message}`)

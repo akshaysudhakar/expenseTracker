@@ -16,7 +16,7 @@
 
     document.getElementById('checkout-button').addEventListener('click', function() {
       const token = localStorage.getItem('token')
-      axios.post('http://localhost:3000/admin/buy_premium',{},{headers : {'authorisation' : token}})
+      axios.post('https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/admin/buy_premium',{},{headers : {'authorisation' : token}})
       .then(response=>{
         const sessionId = response.data.id;
         return stripe.redirectToCheckout({ sessionId: sessionId });
