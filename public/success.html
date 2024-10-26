@@ -53,7 +53,7 @@
             console.log(response)
             if (response.data.userToken){
                 localStorage.setItem('token',response.data.userToken)
-                window.location.href = 'expense.html'; 
+                window.location.href = '/expense.html'; 
             }
         })
         .catch(err => console.log(err,token))

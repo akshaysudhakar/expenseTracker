@@ -29,13 +29,23 @@ const privateKey = fs.readFileSync('server.key');
 const certificate = fs.readFileSync('server.cert');
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors());
+app.use(cors({
+    origin: true, // Allow requests from your Nginx server
+    methods: 'GET,POST,PUT,DELETE',
+    credentials: true, // Include credentials if necessary
+}));
 app.use(helmet());
 app.use(compression());
-app.use(morgan('combined', { stream: accessLogStream }));
+//app.use(morgan('combined', { stream: accessLogStream }));
 
 // Set up your routes
-app.use('/admin', adminroute);
+app.use('/admin', 
+    (req, res, next) => {
+        console.log('A request in the admin path', req);
+        next();
+    }, 
+    adminroute
+);
 app.use('/user', userroute);
 app.use('/premium', premiumroute);
 app.use('/password', passwordroute);
@@ -58,6 +68,6 @@ sequelize.sync()
         const httpsServer = https.createServer({ key: privateKey, cert: certificate }, app);
         
         // Listen on the specified port
-        httpsServer.listen(PORT, () => console.log(`Server is ready on port ${PORT}`));
+        httpsServer.listen(PORT, '0.0.0.0', () => console.log(`Server is ready on port ${PORT}`));
     })
     .catch(err => console.log(err));
