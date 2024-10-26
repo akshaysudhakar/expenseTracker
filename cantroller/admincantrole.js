@@ -23,7 +23,7 @@ exports.addUser = async (req, res, next) => {
         const newUser = await user.create(data);
         
         console.log('Successfully added a new user');
-        res.redirect('/form1.html');
+        res.json({ message: 'your account has been created' })
 
     } 
     catch (err) {

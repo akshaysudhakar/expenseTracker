@@ -7,13 +7,13 @@ const admincantroller = require('./../cantroller/admincantrole');
 
 // Middleware to log the request body before parsing with express.json
 function logBeforeJson(req, res, next) {
-    console.log('Request body before express.json:', req);
+    console.log('Request body before express.json:');
     next();
 }
 
 // Middleware to log the request body after parsing with express.urlencoded
 function logAfterUrlencoded(req, res, next) {
-    console.log('Request body after express.urlencoded:', req.body);
+    console.log('Request body after express.urlencoded:');
     next();
 }
 
