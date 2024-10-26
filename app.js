@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const https = require('https');
+const http = require("http");
 require('dotenv').config(); // Load environment variables from .env file
 
 const cors = require('cors');
@@ -41,7 +41,7 @@ app.use(compression());
 // Set up your routes
 app.use('/admin', 
     (req, res, next) => {
-        console.log('A request in the admin path', req);
+        console.log('A request in the admin path');
         next();
     }, 
     adminroute
@@ -60,14 +60,15 @@ user.hasMany(forgotPassword);
 
 // Sync Sequelize and start the server
 sequelize.sync()
+//sequelize.sync({force: true})
     .then(() => {
         // Get the port from the .env file or use 3000 as a fallback
         const PORT = process.env.PORT || 3000;
         
         // Create an HTTPS server
-        const httpsServer = https.createServer({ key: privateKey, cert: certificate }, app);
+        const httpsServer = http.createServer({ key: privateKey, cert: certificate }, app);
         
         // Listen on the specified port
-        httpsServer.listen(PORT, '0.0.0.0', () => console.log(`Server is ready on port ${PORT}`));
+        httpsServer.listen(PORT, () => console.log(`Server is ready on port ${PORT}`));
     })
     .catch(err => console.log(err));

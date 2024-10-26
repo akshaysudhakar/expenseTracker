@@ -6,7 +6,7 @@
             numOfRows =localStorage.getItem("rows")
             const ul = document.getElementById('listOfExpenses')
             const token = localStorage.getItem('token')
-            axios.get("https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/user/get_expense", {headers : {'authorisation' : token,"pagenumber":pagenumber,"numofrows" : numOfRows}})
+            axios.get("http://localhost:3000/user/get_expense", {headers : {'authorisation' : token,"pagenumber":pagenumber,"numofrows" : numOfRows}})
         .then(response => {
             if(response.data.premium){
                 document.getElementById('notPremiumUser').style.display = "none" 
@@ -68,7 +68,7 @@
             description : description,
             userId : token
         }
-        axios.post("https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/user/add_expense", data , {headers : {'authorisation' : token}})
+        axios.post("http://localhost:3000/user/add_expense", data , {headers : {'authorisation' : token}})
         .then((response)=> {
             console.log(response.data.data)
         })
@@ -80,7 +80,7 @@
             id: id,
             token : token
         }
-        axios.post("https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/user/delete_expense",data)
+        axios.post("http://localhost:3000/user/delete_expense",data)
         .then(response =>{
             console.log(response.data)
         })
@@ -93,7 +93,7 @@
     }
 
     function handleLeaderBoard(){
-        axios.get("https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/premium/leaderboard")
+        axios.get("http://localhost:3000/premium/leaderboard")
         .then(response => {
             const div = document.getElementById('premiumUser');
             response.data.forEach(element=> {
@@ -106,7 +106,7 @@
     
     function download(){
         const token = localStorage.getItem('token')
-        axios.get('https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/premium/download', { headers: {"authorisation" : token} })
+        axios.get('http://localhost:3000/premium/download', { headers: {"authorisation" : token} })
         .then((response) => {
             if(response.status === 201){
                 //the bcakend is essentially sending a download link
