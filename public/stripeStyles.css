@@ -1,0 +1,30 @@
+body {
+    background-color: #f8f9fa; /* Light background for contrast */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    font-family: Arial, sans-serif; /* Smooth font */
+}
+
+h1 {
+    margin-bottom: 2rem; /* Space below heading */
+    color: #343a40; /* Dark text color */
+    text-align: center; /* Center align heading */
+}
+
+#checkout-button {
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white; /* White text */
+    padding: 0.5rem 1.5rem; /* Padding for the button */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 1.25rem; /* Larger font size */
+    cursor: pointer; /* Pointer cursor */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+#checkout-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}

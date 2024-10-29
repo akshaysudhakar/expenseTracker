@@ -57,7 +57,7 @@ exports.forgotPassword = async (req,res,next) => {
             `<html>
             <body>
               <h1>to reset your Password, click the link below</h1>
-              <a href = "http://localhost:3000/password/resetPasswordVerify/${uuid}" >reset password </a>
+              <a href = "https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/password/resetPasswordVerify/${uuid}" >reset password </a>
             </body>
           </html>`
         })

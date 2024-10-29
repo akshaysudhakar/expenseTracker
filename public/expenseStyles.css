@@ -1,0 +1,76 @@
+/* General Styles */
+body {
+    background-color: #f8f9fa; /* Light background for a clean look */
+    font-family: 'Arial', sans-serif; /* Modern font */
+    padding: 20px; /* Padding for body */
+}
+
+/* Form Styles */
+form {
+    background-color: white; /* White background for forms */
+    padding: 20px; /* Padding around form */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    margin-bottom: 20px; /* Spacing below form */
+}
+
+/* Input and Select Styles */
+input[type="number"], input[type="text"], select {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding inside inputs */
+    margin: 10px 0; /* Margin for spacing */
+    border: 1px solid #ced4da; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+}
+
+/* Button Styles */
+button {
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white; /* White text */
+    border: none; /* No border */
+    padding: 10px 15px; /* Padding for buttons */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* List Styles */
+#listOfExpenses {
+    padding: 0;
+}
+
+#listOfExpenses li {
+    background-color: white; /* White background for list items */
+    padding: 10px; /* Padding for list items */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 10px; /* Spacing between items */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    display: flex; /* Flexbox for alignment */
+    justify-content: space-between; /* Space between item text and button */
+}
+
+/* Premium User Section */
+#premiumUser, #notPremiumUser {
+    background-color: #e9ecef; /* Light gray background */
+    padding: 10px; /* Padding for sections */
+    border-radius: 5px; /* Rounded corners */
+    margin-top: 20px; /* Spacing above sections */
+}
+
+#premiumUser p, #notPremiumUser p {
+    margin: 0; /* No margin for paragraphs */
+}
+
+/* Optional Footer Styles */
+.footer {
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white; /* White text */
+    border-radius: 5px; /* Rounded corners */
+}

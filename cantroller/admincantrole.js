@@ -23,7 +23,7 @@ exports.addUser = async (req, res, next) => {
         const newUser = await user.create(data);
         
         console.log('Successfully added a new user');
-        res.redirect('/form1.html');
+        res.status(200).json({message : "new user added"});
 
     } 
     catch (err) {
@@ -36,49 +36,6 @@ exports.addUser = async (req, res, next) => {
         }
     }
 };
-
-/*exports.premium_handler =  async (req,res,next)=>{
-    const {payment_id,user_token} = req.body;
-    try{
-        const payment_intent = await stripe.paymentIntents.create(
-            {
-                amount : 5000,
-                currency : 'usd',
-                payment_method : payment_id,
-                confirm: true,
-                return_url: 'http://localhost:3000/premium_success.html'
-            }
-        )
-
-        const userId = await  tokenVerify.verifyToken(user_token)
-
-        const data = {
-            amount : 5000,
-            status : payment_intent.status,
-            userId : userId.id
-        };
-        await order.create(data)
-
-        const User = await user.findByPk(userId.id);
-
-        User.premium = true;
-
-        await User.save();
-
-        const usertoken = tokenVerify.generateToken(User.id,User.email,User.premium)
-        console.log("the client secret",payment_intent.client_secret, "the whole payment intent", payment_intent);
-
-        res.status(200).send({
-            clientSecret : payment_intent.client_secret,
-            message : "you are now a premium user",
-            user_token : usertoken
-        })
-    }
-    catch(err){
-        console.error('Payment Handling Error:', err);
-        res.status(500).json({message : "an error at payment handling"})
-    }
-}*/
 
 exports.premium_handler = async (req, res) => {
     try {

@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="form1Styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BUgPnlqK4zI0pI1uWW9g3DbFVoo7idBX+nlvAhTV7TxEkc1W7oMZCENsIihEdlWJ" crossorigin="anonymous">
     <title>signup</title>
 </head>
 <script src = "https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
@@ -34,6 +36,7 @@
         axios.post("https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/admin/signup",details)
         .then(response => {
             alert(`${response.data.message}`)
+            window.location.href = '/form2.html'
             }
         )
         .catch(err => console.log(err))

@@ -6,6 +6,10 @@
             numOfRows =localStorage.getItem("rows")
             const ul = document.getElementById('listOfExpenses')
             const token = localStorage.getItem('token')
+            if(!token){
+                window.location.href = "/form2.html";
+                return;
+            }
             axios.get("https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/user/get_expense", {headers : {'authorisation' : token,"pagenumber":pagenumber,"numofrows" : numOfRows}})
         .then(response => {
             if(response.data.premium){
@@ -130,3 +134,9 @@
         const rows = event.target.rows.value;
         localStorage.setItem("rows",rows)
     }
+
+    function handleLogOut(event){
+        event.preventDefault();
+        localStorage.removeItem('token');
+        window.location.href = "/form2.html";
+     }

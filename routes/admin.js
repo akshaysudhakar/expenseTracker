@@ -5,23 +5,10 @@ const authenticate = require('./../middleware/auth');
 
 const admincantroller = require('./../cantroller/admincantrole');
 
-// Middleware to log the request body before parsing with express.json
-function logBeforeJson(req, res, next) {
-    console.log('Request body before express.json:', req);
-    next();
-}
-
-// Middleware to log the request body after parsing with express.urlencoded
-function logAfterUrlencoded(req, res, next) {
-    console.log('Request body after express.urlencoded:', req.body);
-    next();
-}
 
 route.post(
-    '/signup',
-    logBeforeJson,                    // Logs body before express.json()
-    express.json(),
-    logAfterUrlencoded,               // Logs body after express.urlencoded()
+    '/signup',                    
+    express.json(),               
     express.urlencoded({ extended: true }),
     admincantroller.addUser
 );
