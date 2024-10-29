@@ -7,15 +7,36 @@
 </head>
 <script src = "https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
 <body>
-    <form action="/admin/signup" method = 'POST'>
+    <form id = 'form'>
         <label for="name">Enter Username</label>
         <input type="text" required id="name" name = "name">
         <label for="email">Enter e-mail</label>
-        <input type="text" name="email" id="wmail" required>
+        <input type="text" name="email" id="email" required>
         <label for="password">Enter password</label>
         <input type="password" id = "password" name="password" required>
         <button type="submit">submit</button>
     </form>   
     <a href = 'form2.html'> already have an account?</a>
 </body>
+<script>
+    const form = document.getElementById('form')
+    form.addEventListener("submit" , handlesubmit);
+    function handlesubmit(event){
+        event.preventDefault();
+        const email = event.target.email.value;
+        const password = event.target.password.value;
+        const name = event.target.name.value;
+        const details = {
+            name : name,
+            email : email,
+            password:password
+        }
+        axios.post("https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/admin/signup",details)
+        .then(response => {
+            alert(`${response.data.message}`)
+            }
+        )
+        .catch(err => console.log(err))
+    }
+</script>
 </html>

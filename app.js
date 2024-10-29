@@ -19,6 +19,7 @@ const adminroute = require('./routes/admin');
 const userroute = require('./routes/userroute');
 const premiumroute = require('./routes/premium');
 const passwordroute = require('./routes/password');
+const webhookroute = require('./routes/webhook');
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
 
@@ -29,8 +30,11 @@ const privateKey = fs.readFileSync('server.key');
 const certificate = fs.readFileSync('server.cert');
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/webhook',webhookroute)
+
 app.use(cors({
-    origin: true, // Allow requests from your Nginx server
+    origin: '*' ,
     methods: 'GET,POST,PUT,DELETE',
     credentials: true, // Include credentials if necessary
 }));
@@ -39,13 +43,7 @@ app.use(compression());
 //app.use(morgan('combined', { stream: accessLogStream }));
 
 // Set up your routes
-app.use('/admin', 
-    (req, res, next) => {
-        console.log('A request in the admin path', req);
-        next();
-    }, 
-    adminroute
-);
+app.use('/admin',adminroute);
 app.use('/user', userroute);
 app.use('/premium', premiumroute);
 app.use('/password', passwordroute);
