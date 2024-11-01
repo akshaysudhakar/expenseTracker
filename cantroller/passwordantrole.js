@@ -77,7 +77,7 @@ exports.resetPasswordVerify = async (req,res,next) => {
     try {
         const forgot_password_entry = await forgot_password.findByPk(forgotPasswordId)
         if(forgot_password_entry.isActive){
-            res.redirect("/resetPassword.html")
+            res.redirect("https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com/resetPassword.html")
         }
         else{
             console.log('link is not active')
@@ -105,8 +105,8 @@ exports.resetPasswordNew = async (req,res,next)=>{
 
         await userToFetch.save({transaction : t})
 
-        const forgotPasswordLinks = await forgot_password.findByPk(uuid,{transaction : t}
-        )
+        const forgotPasswordLinks = await forgot_password.findByPk(uuid,{transaction : t})
+	console.log("forgot password ",forgotPasswordLinks)
         forgotPasswordLinks.isActive = false;
         await forgotPasswordLinks.save({transaction : t});
 

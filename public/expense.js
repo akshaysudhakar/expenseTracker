@@ -52,7 +52,7 @@
         ul.innerHTML += `
         <li id=${element.id}>
             ${element.expense} - ${element.catogory} - ${element.description}
-            <button onclick='handleDelete(event, ${token},${element.id})'>
+            <button onclick="handleDelete(event, '${token}',${element.id})">
                 Delete Expense
             </button>
         </li>`
@@ -79,14 +79,14 @@
         .catch(err => console.log(err))
     }
 
-    function handleDelete(token,id){
+    function handleDelete(event,token,id){
         const data = {
-            id: id,
-            token : token
+            id: id
         }
-        axios.post("https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/user/delete_expense",data)
+	console.log(data);
+        axios.post("https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/user/delete_expense",data,  {headers : {'authorisation' : token}})
         .then(response =>{
-            console.log(response.data)
+            alert(response.data.message);
         })
         .catch(err => console.log(err))
     }
@@ -138,5 +138,6 @@
     function handleLogOut(event){
         event.preventDefault();
         localStorage.removeItem('token');
+	localStorage.removeItem('rows');
         window.location.href = "/form2.html";
      }

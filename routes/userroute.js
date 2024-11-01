@@ -14,7 +14,7 @@ route.get('/get_expense',authenticate, usercantrole.get_expense);
 
 route.post('/login', usercantrole.userlogin );
 
-route.post('/delete_expense', usercantrole.deleteUser)
+route.post('/delete_expense', authenticate ,usercantrole.deleteUser)
 
 
 

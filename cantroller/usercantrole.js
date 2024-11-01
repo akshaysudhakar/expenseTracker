@@ -85,7 +85,7 @@ exports.get_expense =  async (req,res) => {
             {
                 offset : (pageNumber-1)*rows,
                 limit : rows,
-                attributes: { exclude: ['id', 'userId'] }
+                attributes: { exclude: ['userId'] }
             } 
         );
 
@@ -105,15 +105,12 @@ exports.get_expense =  async (req,res) => {
     } 
 
 exports.deleteUser = async (req,res,next)=>{
-    const token = req.body.token;
     const expenseId = req.body.id;
+    const userId = req.user.id;
     console.log("expense",expenseId);
     let t;
     try{
         t=  await sequelise.transaction();
-        const decoded = await tokenVerify.verifyToken(token)
-
-        const userId = decoded.id; 
 
         const userToFetch  = await user.findByPk(userId,{transaction : t});
 

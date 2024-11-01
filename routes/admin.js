@@ -13,9 +13,9 @@ route.post(
     admincantroller.addUser
 );
 
-route.post('/buy_premium', logBeforeJson,  authenticate, admincantroller.premium_handler);
+route.post('/buy_premium',  authenticate, admincantroller.premium_handler);
 route.post('/buy_premium_status', bodyParser.raw({ type: 'application/json' }), admincantroller.paymentHandler);
-route.get('/confirm_payment', logBeforeJson ,authenticate, admincantroller.confirmPayment);
+route.get('/confirm_payment',authenticate, admincantroller.confirmPayment);
 
 module.exports = route;
 
