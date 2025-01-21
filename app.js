@@ -9,7 +9,7 @@ const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 
-const sequelize = require('./util/database');
+const mongoose = require('mongoose');
 const user = require('./models/user');
 const expense = require('./models/expense');
 const orders = require('./models/order');
@@ -51,15 +51,15 @@ app.use('/premium', premiumroute);
 app.use('/password', passwordroute);
 
 // Define relationships
-expense.belongsTo(user);
-user.hasMany(expense);
-orders.belongsTo(user);
-user.hasMany(orders);
-forgotPassword.belongsTo(user);
-user.hasMany(forgotPassword);
+// expense.belongsTo(user);
+// user.hasMany(expense);
+// orders.belongsTo(user);
+// user.hasMany(orders);
+// forgotPassword.belongsTo(user);
+// user.hasMany(forgotPassword);
 
 // Sync Sequelize and start the server
-sequelize.sync()
+mongoose.connect('mongodb+srv://Akshay:Akshay%402000mongo@cluster0.8by3z.mongodb.net/Expense?retryWrites=true&w=majority&tls=true')
 //sequelize.sync({force: true})
     .then(() => {
         // Get the port from the .env file or use 3000 as a fallback

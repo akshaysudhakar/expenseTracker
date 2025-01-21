@@ -1,9 +1,9 @@
-const expense = require('./../models/expense');
-const user = require('./../models/user');
+const Expense = require('./../models/expense');
+const User = require('./../models/user');
 const sequelise = require("./../util/database")
 const tokenVerify = require("../util/helpers")
 
-
+const mongoose = require('mongoose');
 
 
 const bcrypt = require('bcrypt');
@@ -16,7 +16,7 @@ exports.userlogin = async (req,res,next) => {
     const email = req.body.email;
     const password = req.body.password;
     try {
-        const requested_user = await user.findOne({where : {email : email}}) 
+        const requested_user = await User.findOne({email}) 
         if(!requested_user){
             return res.json({message : 'user not found'})
         }
@@ -37,37 +37,46 @@ exports.userlogin = async (req,res,next) => {
     }
 }
 
-exports.add_expense = async (req,res,next) => {
-    const data = req.body
-    let t;
-    const userId = req.user.id; 
-    try{
-        t = await  sequelise.transaction();
+exports.add_expense = async (req, res, next) => {
+    const data = req.body;
+    let session;
+    const userId = req.user.id;
+    try {
+        // Start a session
+        session = await mongoose.startSession();
+        session.startTransaction();
 
-        data.userId = userId;
+        data.user = userId;
 
-        await expense.create(data,{transaction : t});
+        // Create a new Expense document
+        const expense = new Expense(data);
+        await expense.save({ session });  // Save with session
 
-        const userToAdd = await user.findByPk(userId,{transaction : t});
-        
-        const newTotalExpense  = userToAdd.totalExpense + parseFloat(data.expense);
+        // Update the user's total expense
+        const user = await User.findById(userId).session(session);  // Use the session here as well
+        const newTotalExpense = user.totalExpense + parseFloat(data.expense);
+        user.totalExpense = newTotalExpense;
 
-        userToAdd.totalExpense = newTotalExpense;
+        await user.save({ session });  // Save with session
 
-        await userToAdd.save({transaction : t});
+        // Commit the transaction
+        await session.commitTransaction();
+        res.status(200).json({ message: 'Expense added successfully' });
 
-        await t.commit()
-
-        res.status(200).json({message : "data added successfully"})
-        
-    }
-    catch(err){
-        if(t){
-            await t.rollback();
+    } catch (err) {
+        // If an error occurs, rollback the transaction
+        if (session) {
+            await session.abortTransaction();
         }
         console.log(err);
-        res.status(500).json({message : 'error in creating a new expense',err})
-        }    } 
+        res.status(500).json({ message: 'Error in creating a new expense', err });
+    } finally {
+        // End the session after the transaction is completed or aborted
+        if (session) {
+            session.endSession();
+        }
+    }
+};
 
 exports.get_expense =  async (req,res) => {
     const userId = req.user.id; 

@@ -20,7 +20,9 @@ exports.addUser = async (req, res, next) => {
 
         data.password = hashedPassword;
 
-        const newUser = await user.create(data);
+        const newUser = new user(data);
+
+        await newUser.save();
         
         console.log('Successfully added a new user');
         res.json({ message: 'your account has been created' })

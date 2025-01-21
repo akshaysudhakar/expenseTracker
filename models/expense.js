@@ -1,24 +1,27 @@
-const Sequelize = require('sequelize')
-const sequelize = require('./../util/database');
+const mongoose = require('mongoose');
 
-const expense_model = sequelize.define('expense', {
-    id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
-    },
-    expense :{
-        type : Sequelize.DOUBLE,
-        allowNull : false,
-    },
-    catogory :{
-        type : Sequelize.STRING,
-        allowNull : false,
-    },
-    description :{
-        type : Sequelize.STRING,
-        allowNull : false,
-    }
-})
+const schema = mongoose.Schema;
 
-module.exports = expense_model;
+const expenseSchema = new schema({
+  expense: {
+    type: Number, // Use Number for storing doubles in Mongoose
+    required: true,
+  },
+  category: {
+    type: String, // Corrected the spelling from 'catogory' to 'category'
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  user: {
+    type: schema.Types.ObjectId, // Reference to User model
+    ref: 'User', // 'User' is the name of the User model
+    required: true, // Ensuring the relationship is required
+  },
+});
+
+// Export the Mongoose model
+module.exports = mongoose.model('Expense', expenseSchema);
+

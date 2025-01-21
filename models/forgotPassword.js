@@ -1,22 +1,24 @@
-const Sequelize = require('sequelize')
-const {v4: uuidv4} = require('uuid')
+const mongoose = require('mongoose');
 
-const sequelize = require('./../util/database');
+const schema = mongoose.Schema;
 
-const fpasswordModel = sequelize.define(
-    'forgot_password',{
-        id:{
-            type : Sequelize.UUID,
-            defaultValue : uuidv4,
-            primaryKey : true
-        },
-        isActive:{
-            type : Sequelize.BOOLEAN,
-            allowNull : false
-        }
-    }
-)
+const forgotPasswordSchema = new schema({
+  id: {
+    type: String, // Use String for UUID
+    default: () => require('uuid').v4(), // Generates UUID using uuidv4
+    unique: true,
+  },
+  isActive: {
+    type: Boolean,
+    required: true,
+  },
+  user: {
+    type: schema.Types.ObjectId, // Reference to User model
+    ref: 'User', // 'User' is the name of the User model
+    required: true, // Ensuring the relationship is required
+  },
+});
 
-module.exports = fpasswordModel;
-
+// Export the Mongoose model
+module.exports = mongoose.model('ForgotPassword', forgotPasswordSchema);
 

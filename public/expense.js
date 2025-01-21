@@ -60,13 +60,13 @@
     function handlesubmit(event){
         const expense = event.target.expense.value;
         const description = event.target.description.value;
-        const catogory = event.target.catogory.value;
+        const category = event.target.catogory.value;
         const token = localStorage.getItem('token')
         const data = {
             expense : expense,
-            catogory : catogory,
+            category : category,
             description : description,
-            userId : token
+            user : token
         }
         axios.post("http://localhost:3000/user/add_expense", data , {headers : {'authorisation' : token}})
         .then((response)=> {
