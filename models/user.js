@@ -26,14 +26,22 @@ const userSchema = new schema({
     required: true,
     default: false,
   },
-});
-
-// Virtual field for `expenses`
-userSchema.virtual('expenses', {
-  ref: 'Expense', // Reference to Expense model
-  localField: '_id', // Local field in User schema
-  foreignField: 'user', // Field in Expense schema that references User
-});
+  expenses :[{
+    expense: {
+      type: Number, 
+      required: true,
+    },
+    category: {
+      type: String, 
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    }
+  }]
+}
+);
 
 // Virtual field for `forgotPasswords`
 userSchema.virtual('forgotPasswords', {

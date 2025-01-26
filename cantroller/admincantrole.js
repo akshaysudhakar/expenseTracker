@@ -1,8 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const user = require('./../models/user');
-const order= require("./../models/order");
+const User = require('./../models/user');
+const Order= require("./../models/order");
 
 const tokenVerify = require("../util/helpers")
 
@@ -20,7 +20,7 @@ exports.addUser = async (req, res, next) => {
 
         data.password = hashedPassword;
 
-        const newUser = new user(data);
+        const newUser = new User(data);
 
         await newUser.save();
         
@@ -39,48 +39,7 @@ exports.addUser = async (req, res, next) => {
     }
 };
 
-/*exports.premium_handler =  async (req,res,next)=>{
-    const {payment_id,user_token} = req.body;
-    try{
-        const payment_intent = await stripe.paymentIntents.create(
-            {
-                amount : 5000,
-                currency : 'usd',
-                payment_method : payment_id,
-                confirm: true,
-                return_url: 'http://localhost:3000/premium_success.html'
-            }
-        )
 
-        const userId = await  tokenVerify.verifyToken(user_token)
-
-        const data = {
-            amount : 5000,
-            status : payment_intent.status,
-            userId : userId.id
-        };
-        await order.create(data)
-
-        const User = await user.findByPk(userId.id);
-
-        User.premium = true;
-
-        await User.save();
-
-        const usertoken = tokenVerify.generateToken(User.id,User.email,User.premium)
-        console.log("the client secret",payment_intent.client_secret, "the whole payment intent", payment_intent);
-
-        res.status(200).send({
-            clientSecret : payment_intent.client_secret,
-            message : "you are now a premium user",
-            user_token : usertoken
-        })
-    }
-    catch(err){
-        console.error('Payment Handling Error:', err);
-        res.status(500).json({message : "an error at payment handling"})
-    }
-}*/
 
 exports.premium_handler = async (req, res) => {
     try {
@@ -97,17 +56,19 @@ exports.premium_handler = async (req, res) => {
           quantity: 1,
         }],
         mode: 'payment',
-        success_url: `https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/success.html?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: 'https://ec2-13-234-76-163.ap-south-1.compute.amazonaws.com:3000/cancel.html',
+        success_url: `http://localhost:3000/success.html?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: 'http://localhost:3000/cancel.html',
       });
       const data = {
         amount : 50,
         status : 'pending',
-        userId : req.user.id,
-        sessionId : session.id
+        sessionId : session.id,
+        user : req.user,
       }
 
-      await order.create(data)
+      const order = new Order(data);
+
+      await order.save();
 
       res.json({ id: session.id });
 
@@ -147,6 +108,7 @@ exports.paymentHandler = async (req, res) => {
     case 'checkout.session.completed':
       const checkout = event.data.object;
       console.log('Payment checkout was successfull:', checkout);
+
       await updateUser(checkout.id,checkout.status)
       break;
 
@@ -161,9 +123,9 @@ exports.paymentHandler = async (req, res) => {
 
 exports.confirmPayment = async (req,res,next)=>{
   try{
-    const User = await user.findByPk(req.user.id);
+    const user = await User.findById(req.user.id);
 
-    const usertoken = tokenVerify.generateToken(User.id,User.email,User.premium)
+    const usertoken = tokenVerify.generateToken(user.id,user.email,user.premium)
 
     res.status(200).json({userToken : usertoken})
     
@@ -177,20 +139,20 @@ exports.confirmPayment = async (req,res,next)=>{
 
   
 async function updateUser(sessionId,status){     
-    const Order = await order.findOne({where: {sessionId : sessionId}});
+    const order = await Order.findOne({sessionId : sessionId});
 
-    if(Order){
-      const userId = Order.userId
+    if(order){
+      const userId = order.user
 
-      Order.status = status
+      order.status = status
 
-      await Order.save()
+      await order.save()
 
-      const User = await user.findByPk(userId)
+      const user = await User.findById(userId);
       
-      User.premium = true;
+      user.premium = true;
 
-      await User.save();
+      await user.save();
 
     }
 }

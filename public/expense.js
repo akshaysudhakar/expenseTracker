@@ -43,12 +43,11 @@
     }
 
     function displayExpense(element){
-        const token = localStorage.getItem('token')
         const ul = document.getElementById('listOfExpenses');
         ul.innerHTML += `
         <li id=${element.id}>
-            ${element.expense} - ${element.catogory} - ${element.description}
-            <button onclick='handleDelete(event, ${token},${element.id})'>
+            ${element.expense} - ${element.category} - ${element.description}
+            <button onclick="handleDelete('${element._id}')">
                 Delete Expense
             </button>
         </li>`
@@ -75,12 +74,12 @@
         .catch(err => console.log(err))
     }
 
-    function handleDelete(token,id){
+    function handleDelete(id){
+        const token = localStorage.getItem('token');
         const data = {
             id: id,
-            token : token
         }
-        axios.post("http://localhost:3000/user/delete_expense",data)
+        axios.post("http://localhost:3000/user/delete_expense",data, {headers : {'authorisation' : token}})
         .then(response =>{
             console.log(response.data)
         })
@@ -96,6 +95,9 @@
         axios.get("http://localhost:3000/premium/leaderboard")
         .then(response => {
             const div = document.getElementById('premiumUser');
+            if(div.querySelectorAll('li')){
+                div.querySelectorAll('li').forEach(li=> li.remove())
+            }
             response.data.forEach(element=> {
                 const li = document.createElement('li');
                 li.textContent = `${element.name} : ${element.totalExpense}`

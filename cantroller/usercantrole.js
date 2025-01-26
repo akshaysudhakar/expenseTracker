@@ -1,10 +1,8 @@
-const Expense = require('./../models/expense');
 const User = require('./../models/user');
-const sequelise = require("./../util/database")
+
 const tokenVerify = require("../util/helpers")
 
 const mongoose = require('mongoose');
-
 
 const bcrypt = require('bcrypt');
 
@@ -40,64 +38,34 @@ exports.userlogin = async (req,res,next) => {
 exports.add_expense = async (req, res, next) => {
     const data = req.body;
     let session;
-    const userId = req.user.id;
     try {
-        // Start a session
-        session = await mongoose.startSession();
-        session.startTransaction();
+       
+        req.user.expenses.push(data)
 
-        data.user = userId;
+        req.user.totalExpense = req.user.totalExpense + parseFloat(data.expense);
+        
+        await req.user.save();  // Save with session
 
-        // Create a new Expense document
-        const expense = new Expense(data);
-        await expense.save({ session });  // Save with session
-
-        // Update the user's total expense
-        const user = await User.findById(userId).session(session);  // Use the session here as well
-        const newTotalExpense = user.totalExpense + parseFloat(data.expense);
-        user.totalExpense = newTotalExpense;
-
-        await user.save({ session });  // Save with session
-
-        // Commit the transaction
-        await session.commitTransaction();
         res.status(200).json({ message: 'Expense added successfully' });
 
     } catch (err) {
-        // If an error occurs, rollback the transaction
-        if (session) {
-            await session.abortTransaction();
-        }
         console.log(err);
         res.status(500).json({ message: 'Error in creating a new expense', err });
-    } finally {
-        // End the session after the transaction is completed or aborted
-        if (session) {
-            session.endSession();
-        }
-    }
+    } 
 };
 
 exports.get_expense =  async (req,res) => {
     const userId = req.user.id; 
     const pageNumber = parseInt(req.headers.pagenumber,10) || 1
     const rows = parseInt(req.headers.numofrows,10) || 5
-    console.log(pageNumber)
 
     try{ 
 
-        const userToFetch  = await user.findByPk(userId);
+        const totalExpenses = req.user.expenses.length;
 
-        const totalExpenses = await userToFetch.countExpenses();
+        const expenses = req.user.expenses.slice((pageNumber - 1) * rows, pageNumber * rows); 
 
-        const expenses = await userToFetch.getExpenses(
-            {
-                offset : (pageNumber-1)*rows,
-                limit : rows,
-                attributes: { exclude: ['id', 'userId'] }
-            } 
-        );
-
+        
         res.json({
             expenses,
             premium: req.user.premium,
@@ -114,41 +82,29 @@ exports.get_expense =  async (req,res) => {
     } 
 
 exports.deleteUser = async (req,res,next)=>{
-    const token = req.body.token;
     const expenseId = req.body.id;
     console.log("expense",expenseId);
-    let t;
     try{
-        t=  await sequelise.transaction();
-        const decoded = await tokenVerify.verifyToken(token)
+        let expenseIndex
 
-        const userId = decoded.id; 
+        expenseToDelete  =  req.user.expenses
+        .find((exp,index) =>{
+            if(exp._id.toString() === expenseId){
+                expenseIndex = index;
+                return true
+        } 
+        return false
+        });
 
-        const userToFetch  = await user.findByPk(userId,{transaction : t});
+        req.user.totalExpense  = parseFloat(req.user.totalExpense) - parseFloat(expenseToDelete.expense);
 
-        const expense = await userToFetch.getExpenses(
-            {where: {
-            id: expenseId  
-            }},
-            {transaction : t}
-        );
+        req.user.expenses.splice(expenseIndex,1)
 
-        const newTotalExpense  = parseFloat(userToFetch.totalExpense) - parseFloat(expense[0].expense);
-
-        await expense[0].destroy({transaction : t})
-
-        userToFetch.totalExpense = parseFloat(newTotalExpense);
-
-        await userToFetch.save({transaction : t})
-
-        await t.commit()
+        await req.user.save()
 
         res.status(200).json({message : "deleted successfully"})
     }
     catch(err){
-        if(t){
-            await t.rollback()
-        }
         console.log(err)
         res.status(500).json({msg : 'delete op error'})
         }

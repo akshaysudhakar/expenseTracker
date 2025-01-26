@@ -1,9 +1,8 @@
 const bcrypt = require('bcrypt');
 const sib = require("sib-api-v3-sdk");
 
-const sequelize = require("../util/database")
-const user = require("./../models/user")
-const forgot_password = require("./../models/forgotPassword")
+const User = require("./../models/user")
+const Fpassword = require("./../models/forgotPassword")
 
 const tokenVerify = require("../util/helpers")
 
@@ -15,37 +14,36 @@ apiKey.apiKey = process.env.API_KEY
 
 
 exports.forgotPassword = async (req,res,next) => {
-    let t;
-    const email = req.body.pemail
+    const pemail = req.body.pemail
     const transEmailApi = new sib.TransactionalEmailsApi();
     const sender = {
         email : "akshayvisionary@gmail.com"
     }
     const recievers = [
         {
-            email : email
+            email : pemail
         }
     ]
     try{
         console.log('entered try block');
 
-        t = await  sequelize.transaction();
 
-        const User = await user.findOne({
-            where: {
+        const user = await User.findOne(
+            {
                 email: req.body.uemail
-            },
-            transaction: t  // Place transaction here
-        });
+            }
+        )
         
 
-        const user_id = User.id;
+        const user_id = user.id;
         const token = tokenVerify.generateToken(user_id,req.body.uemail,User.premium);
         const data = {
             isActive : true,
-            userId : user_id
+            user : user_id
         }
-        const forgotPasswordEntry = await forgot_password.create(data,{transaction : t});
+        const forgotPasswordEntry = new Fpassword(data)
+
+        await forgotPasswordEntry.save();
 
         const uuid = forgotPasswordEntry.id
 
@@ -62,11 +60,9 @@ exports.forgotPassword = async (req,res,next) => {
           </html>`
         })
 
-        await t.commit()
         res.status(200).json({message : "check your mail for reset password link",token :token,uuid : uuid})
     }
     catch(err){
-        if(t) await t.rollback()
         console.log(err)
         res.status(500).json(err)
     }   
@@ -75,7 +71,7 @@ exports.forgotPassword = async (req,res,next) => {
 exports.resetPasswordVerify = async (req,res,next) => {
     const forgotPasswordId = req.params.id
     try {
-        const forgot_password_entry = await forgot_password.findByPk(forgotPasswordId)
+        const forgot_password_entry = await Fpassword.findOne({id :forgotPasswordId})
         if(forgot_password_entry.isActive){
             res.redirect("/resetPassword.html")
         }
@@ -93,30 +89,22 @@ exports.resetPasswordVerify = async (req,res,next) => {
 exports.resetPasswordNew = async (req,res,next)=>{
     const newPassword = req.body.newPassword;
     const uuid = req.body.uuid;
-    const userId = req.user.id;
-    let t
     try{
-        t =  await sequelize.transaction(); 
-        const userToFetch = await user.findByPk(userId,{transaction : t});
-
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        userToFetch.password = hashedPassword;
+        req.user.password = hashedPassword;
 
-        await userToFetch.save({transaction : t})
+        await req.user.save();
 
-        const forgotPasswordLinks = await forgot_password.findByPk(uuid,{transaction : t}
-        )
+        const forgotPasswordLinks = await Fpassword.findOne({id : uuid})
+
         forgotPasswordLinks.isActive = false;
-        await forgotPasswordLinks.save({transaction : t});
 
-        await t.commit();
+        await forgotPasswordLinks.save();
 
         res.status(200).json({message:"successfully changed the password"})     
-
     }
     catch(err){
-        await t.rollback();
         console.log(err);
         res.status(500).json({message:"your password could not be changed"})
     }

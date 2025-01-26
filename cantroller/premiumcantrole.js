@@ -1,13 +1,12 @@
 const { Sequelize } = require('sequelize');
-const expense = require('./../models/expense');
-const user = require('./../models/user');
+const User = require('./../models/user');
 const AWS = require('aws-sdk');
 
 
 
 function uploadToS3(data,filename){
     return new Promise((resolve,reject)=>{
-        const BUCKET_NAME = 'akshayexpensetracker'
+    const BUCKET_NAME = 'akshayexpensetracker'
     const IAM_USER_KEY = process.env.AMAZON_ACCESS_KEY;
     const IAM_USER_SECRET =process.env.AMAZON_SECRET_ACCESS_KEY
 
@@ -41,29 +40,15 @@ function uploadToS3(data,filename){
 
 exports.leaderBoard = async (req, res, next) => {
     try {
-        const userExpenses = await user.findAll({
-            include: [
-                {
-                    model: expense,
-                    attributes: [] // No need to select any columns from expense table
-                }
-            ],
-            attributes: [
-                'name', 
-                [Sequelize.fn('SUM', Sequelize.col('expenses.expense')), 'totalExpense']
-            ],
-            group: ['users.id'], // Group by user ID
-            order: [[Sequelize.literal('totalExpense'), 'DESC']] // Sort by totalExpense
-        });
+        const userExpenses = await User.find(
+            {},
+            {name : 1, totalExpense : 1 , _id : -1},
+            {sort : {totalExpense : -1}}
+        );
 
-        // Map the result to include only name and total expense
-        const result = userExpenses.map(u => ({
-            name: u.name,
-            totalExpense: u.dataValues.totalExpense
-        }));
-
-        res.json(result);
-    } catch (err) {
+        res.json(userExpenses);
+    } 
+    catch (err) {
         console.log(err);
         res.status(500).json({ error: 'An error occurred' });
     }
@@ -71,16 +56,12 @@ exports.leaderBoard = async (req, res, next) => {
 
 
 exports.downloadExpense = async(req,res)=>{
-    const userId = req.user.id;  
-    console.log(req.user)
     try{
-        const userToFetch  = await user.findByPk(userId);
-
-        const expenses = await userToFetch.getExpenses();
+        const expenses = req.user.expenses;
         
         const stringifiedExpenses = JSON.stringify(expenses);
 
-        const filename = `expense${userToFetch.id}/${new Date()}.txt`;
+        const filename = `expense${req.user.id}/${new Date()}.txt`;
 
         const fileUrl = await uploadToS3(stringifiedExpenses,filename);
 
@@ -90,5 +71,4 @@ exports.downloadExpense = async(req,res)=>{
     catch(err){
         console.log(err)
     }
-
 }
